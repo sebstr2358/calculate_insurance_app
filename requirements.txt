@@ -1,0 +1,8 @@
+streamlit
+pandas
+pycaret[full]
+streamlit-audiorecorder
+python-dotenv
+openai
+instructor
+pydantic
