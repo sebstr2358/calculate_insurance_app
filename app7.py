@@ -94,7 +94,21 @@ def validate_response_data(person):
         else:
             st.error("🛑 Niepoprawne wartości dla jednego z pól!")
             return None
-        
+
+def reduce_cost_and_display_message(person_df, weight, height, weight_change, direction):
+    new_weight = weight + weight_change
+    new_bmi = new_weight / (height ** 2)
+    new_df = person_df.copy()
+    new_df["bmi"] = round(new_bmi, 2)
+    new_cost = predict_cost(model, new_df)
+
+    if (direction == "lower" and new_cost < predicted_charge) or (direction == "increase" and new_cost < predicted_charge):
+        with st.spinner("Jeszcze chwila..."):
+            time.sleep(2)
+            action = "zredukuj" if direction == "lower" else "zwiększ"
+            st.markdown(f"- {action.capitalize()} masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {new_cost} {CURRENCY}!")
+
+
 st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
 
 
@@ -353,24 +367,40 @@ with st.sidebar:
         "<h5>Wypełnij formularz</h5>",
         unsafe_allow_html=True
     )
-        age = st.number_input("Wiek", min_value=0, max_value=100, value=18, step=1)
-        gender = st.radio('Płeć', ['mężczyzna', 'kobieta'], index=0)
-        height = st.number_input("Wzrost", min_value=0.1, max_value=2.30, step=0.01, value=1.7)
-        weight = st.number_input("Waga", min_value=2, max_value=180, step=1, value=70)
-        children = st.number_input("Dzieci", min_value=0, max_value=12, step=1)
-        smoker = st.radio('Jestem osobą palącą', ['tak', 'nie'], index=1)
-        live_place = st.selectbox('Region', ['południowy wschód', 'południowy zachód', 'północny wschód', 'północny zachód'], index=0)
+        
+        if 'age' not in st.session_state:
+            st.session_state.age = 18
+        if 'gender' not in st.session_state:
+            st.session_state.gender = 'mężczyzna'
+        if 'height' not in st.session_state:
+            st.session_state.height = 1.7
+        if 'weight' not in st.session_state:
+            st.session_state.weight = 70
+        if 'children' not in st.session_state:
+            st.session_state.children = 0
+        if 'smoker' not in st.session_state:
+            st.session_state.smoker = 'nie'
+        if 'live_place' not in st.session_state:
+            st.session_state.live_place = 'południowy wschód'
 
-        write_bmi = weight / (height ** 2)
+        st.session_state.age = st.number_input("Wiek", min_value=0, max_value=100, value=st.session_state.age, step=1)
+        st.session_state.gender = st.radio('Płeć', ['mężczyzna', 'kobieta'], index=0 if st.session_state.gender == 'mężczyzna' else 1)
+        st.session_state.height = st.number_input("Wzrost", min_value=0.1, max_value=2.30, step=0.01, value=st.session_state.height)
+        st.session_state.weight = st.number_input("Waga", min_value=2, max_value=180, step=1, value=st.session_state.weight)
+        st.session_state.children = st.number_input("Dzieci", min_value=0, max_value=12, step=1, value=st.session_state.children)
+        st.session_state.smoker = st.radio('Jestem osobą palącą', ['tak', 'nie'], index=1 if st.session_state.smoker == 'nie' else 0)
+        st.session_state.live_place = st.selectbox('Region', ['południowy wschód', 'południowy zachód', 'północny wschód', 'północny zachód'], index=['południowy wschód', 'południowy zachód', 'północny wschód', 'północny zachód'].index(st.session_state.live_place))
+
+        write_bmi = st.session_state.weight / (st.session_state.height ** 2)
 
         # Tworzenie DataFrame dla modelu
         write_person_df = pd.DataFrame([{
-            "age": age,
-            "sex": gender,
+            "age": st.session_state.age,
+            "sex": st.session_state.gender,
             "bmi": round(write_bmi, 2),
-            "children": children,
-            "smoker": smoker,
-            "region": live_place,
+            "children": st.session_state.children,
+            "smoker": st.session_state.smoker,
+            "region": st.session_state.live_place,
         }])
 
         #with st.sidebar:
@@ -379,8 +409,12 @@ with st.sidebar:
             with st.spinner("Czekaj, obliczam..."):
                 predicted_charge = predict_cost(model, write_person_df)
                 # Sztuczne opóźnienie dla demonstrowania spinnera działania
-                time.sleep(2)
-            st.header(f"Koszt Twojego ubezpieczenia wyniesie {predicted_charge} {CURRENCY}")
+                
+                st.header(f"Koszt Twojego ubezpieczenia wyniesie {predicted_charge} {CURRENCY}")
+
+            weight = st.session_state.weight
+            height = st.session_state.height
+            smoker = st.session_state.smoker
 
             # Wskazówki do obniżenia kosztów
             if smoker == "tak":
@@ -392,37 +426,10 @@ with st.sidebar:
                     st.markdown(f"- Przestań palić, a Twój koszt ubezpieczenia wyniesie {cost_no_smoke} {CURRENCY}!")
 
             if write_bmi > 24.9:
-                new_weight = weight - 10
-                new_bmi = new_weight / (height ** 2)
-                write_person_df_lower_bmi = write_person_df.copy()
-                write_person_df_lower_bmi["bmi"] = round(new_bmi, 2)
-                cost_lower_bmi = predict_cost(model, write_person_df_lower_bmi)
-                if cost_lower_bmi < predicted_charge:
-                    if smoker == "tak":
-                        with st.spinner("Jeszcze chwila..."):
-                            time.sleep(1.5)
-                            st.markdown(f"- Zredukuj masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_lower_bmi} {CURRENCY}!")
-                    else:
-                        with st.spinner("Czekaj, generuję wskazówki do obniżenia kosztu..."):
-                            time.sleep(2.5)
-                            st.markdown(f"- Zredukuj masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_lower_bmi} {CURRENCY}!")
+                reduce_cost_and_display_message(write_person_df, weight, height, -10, "lower")
 
             if write_bmi < 18.5:
-                new_weight = weight + 10
-                new_bmi = new_weight / (height ** 2)
-                write_person_df_higher_bmi = write_person_df.copy()
-                write_person_df_higher_bmi["bmi"] = round(new_bmi, 2)
-                cost_higher_bmi = predict_cost(model, write_person_df_higher_bmi)
-                if cost_higher_bmi < predicted_charge:
-                    if smoker == "tak":
-                        with st.spinner("Jeszcze chwila..."):
-                            time.sleep(1.5)
-                            st.markdown(f"- Zwiększ masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_higher_bmi} {CURRENCY}!")
-                    else:
-                        with st.spinner("Czekaj, generuję wskazówki do obniżenia kosztu..."):
-                            time.sleep(2.5)
-                            st.markdown(f"- Zwiększ masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_higher_bmi} {CURRENCY}!")
-
+                reduce_cost_and_display_message(write_person_df, weight, height, 10, "increase")
 
 
 
