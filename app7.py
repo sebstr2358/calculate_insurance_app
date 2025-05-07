@@ -325,43 +325,15 @@ with st.sidebar:
                 if st.session_state["speech_bmi"] is not None:
                     speech_bmi = st.session_state["speech_bmi"]
                     if speech_bmi > 24.9:
-                        new_weight = person.weight - 10
                         if person.height > 3.0:
-                            new_bmi = new_weight / ((person.height / 100) ** 2)
-                        else:
-                            new_bmi = new_weight / (person.height ** 2)
-                        speech_person_df_lower_bmi = st.session_state["speech_person_df"].copy()
-                        speech_person_df_lower_bmi["bmi"] = round(new_bmi, 2)
-                        cost_lower_bmi = predict_cost(model, speech_person_df_lower_bmi)
-                        if cost_lower_bmi < predicted_charge:
-                            if person.smoker == "tak":
-                                with st.spinner("Jeszcze chwila..."):
-                                    time.sleep(1.5)
-                                    st.markdown(f"- Zredukuj masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_lower_bmi} {CURRENCY}!")
-                            else:
-                                with st.spinner("Czekaj, generuję wskazówki do obniżenia kosztu..."):
-                                    time.sleep(2.5)
-                                    st.markdown(f"- Zredukuj masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_lower_bmi} {CURRENCY}!")
-
+                            person.height = person.height / 100
+                        reduce_cost_and_display_message(st.session_state["speech_person_df"], person.weight, person.height, -10, "lower")
+                     
                     if speech_bmi < 18.5:
-                        new_weight = person.weight + 10
                         if person.height > 3.0:
-                            new_bmi = new_weight / ((person.height / 100) ** 2)
-                        else:
-                            new_bmi = new_weight / (person.height ** 2)
-                        speech_person_df_higher_bmi = st.session_state["speech_person_df"].copy()
-                        speech_person_df_higher_bmi["bmi"] = round(new_bmi, 2)
-                        cost_higher_bmi = predict_cost(model, speech_person_df_higher_bmi)
-                        if cost_higher_bmi < predicted_charge:
-                            if person.smoker == "tak":
-                                with st.spinner("Jeszcze chwila..."):
-                                    time.sleep(1.5)
-                                    st.markdown(f"- Zwiększ masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_higher_bmi} {CURRENCY}!")
-                            else:
-                                with st.spinner("Czekaj, generuję wskazówki do obniżenia kosztu..."):
-                                    time.sleep(2.5)
-                                    st.markdown(f"- Zwiększ masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {cost_higher_bmi} {CURRENCY}!")
-
+                            person.height = person.height / 100
+                        reduce_cost_and_display_message(st.session_state["speech_person_df"], person.weight, person.height, 10, "lower")
+                                        
     else:
         st.markdown(
         "<h5>Wypełnij formularz</h5>",
