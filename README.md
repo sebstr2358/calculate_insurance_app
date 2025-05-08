@@ -5,14 +5,14 @@ The application allows for quick calculation of life insurance costs, offering u
 
 <h3>How to run locally</h3>
 In your command prompt:
-1. conda install -y streamlit #conda-forge::ffmpeg openai python-dotenv
-2. pip install streamlit-audiorecorder 
-3. conda install pydub==0.25.1
-4. conda install ffmpeg==6.1.1
-5. pip install pycaret[full]
-6. conda install pandas==1.5.3
-7. pip install instructor
-8. streamlit run app7.py
+- 1. conda install -y streamlit #conda-forge::ffmpeg openai python-dotenv
+- 2. pip install streamlit-audiorecorder 
+- 3. conda install pydub==0.25.1
+- 4. conda install ffmpeg==6.1.1
+- 5. pip install pycaret[full]
+- 6. conda install pandas==1.5.3
+- 7. pip install instructor
+- 8. streamlit run app7.py
 
 <h3>Link</h3>
 https://calculate-insurance-app.streamlit.app/
