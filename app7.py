@@ -95,18 +95,35 @@ def validate_response_data(person):
             st.error("🛑 Niepoprawne wartości dla jednego z pól!")
             return None
 
-def reduce_cost_and_display_message(person_df, weight, height, weight_change, direction):
-    new_weight = weight + weight_change
-    new_bmi = new_weight / (height ** 2)
-    new_df = person_df.copy()
-    new_df["bmi"] = round(new_bmi, 2)
-    new_cost = predict_cost(model, new_df)
+def reduce_cost_and_display_message(person_df, weight, height, weight_changes, direction):
+    valid_weight_change = None  # Zmienne do przechowywania znalezionej wagi
+    min_cost = float('inf')  # Ustaw minimalny koszt na nieskończoność
 
-    if (direction == "lower" and new_cost < predicted_charge) or (direction == "increase" and new_cost < predicted_charge):
+    for weight_change in weight_changes:
+        new_weight = weight - weight_change
+        new_bmi = new_weight / (height ** 2)
+        new_df = person_df.copy()
+        new_df["bmi"] = round(new_bmi, 2)
+        new_cost = predict_cost(model, new_df)
+
+        # Sprawdź warunek dla nowego kosztu
+        if (direction == "lower" and new_cost < predicted_charge) or \
+           (direction == "increase" and new_cost < predicted_charge):
+
+            # Sprawdź, czy nowy koszt jest mniejszy od minimalnego kosztu
+            if new_cost < min_cost:
+                min_cost = new_cost  # Zaktualizuj minimalny koszt
+                valid_weight_change = weight_change  # Przechowaj zmianę wagę
+
+    # Wypisz komunikat, jeśli znaleziono prawidłowy wynik
+    if valid_weight_change is not None:
         with st.spinner("Jeszcze chwila..."):
-            time.sleep(2)
-            action = "zredukuj" if direction == "lower" else "zwiększ"
-            st.markdown(f"- {action.capitalize()} masę o 10 kg, a Twój koszt ubezpieczenia wyniesie {new_cost} {CURRENCY}!")
+            if direction == "lower":
+                st.markdown(f"- Zredukuj masę o {valid_weight_change} kg, a Twój koszt ubezpieczenia wyniesie {min_cost} {CURRENCY}!")
+            elif direction == "increase":
+                st.markdown(f"- Zwiększ masę o {-valid_weight_change} kg, a Twój koszt ubezpieczenia wyniesie {min_cost} {CURRENCY}!")
+
+    return valid_weight_change  # Zwróć wartość zmian wagi, jeśli znalazłeś właściwą
 
 
 st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
@@ -324,16 +341,16 @@ with st.sidebar:
                                 st.markdown(f"- Przestań palić, a Twój koszt ubezpieczenia wyniesie {cost_no_smoke} {CURRENCY}!")
                 if st.session_state["speech_bmi"] is not None:
                     speech_bmi = st.session_state["speech_bmi"]
+                    if person.height > 3.0:
+                        person.height = person.height / 100
                     if speech_bmi > 24.9:
-                        if person.height > 3.0:
-                            person.height = person.height / 100
-                        reduce_cost_and_display_message(st.session_state["speech_person_df"], person.weight, person.height, -10, "lower")
-                     
-                    if speech_bmi < 18.5:
-                        if person.height > 3.0:
-                            person.height = person.height / 100
-                        reduce_cost_and_display_message(st.session_state["speech_person_df"], person.weight, person.height, 10, "lower")
-                                        
+                        lose_weight_changes = [5, 10, 15, 20]  # Możliwe zmiany wagi
+                        reduce_cost_and_display_message(st.session_state["speech_person_df"], person.weight, person.height, lose_weight_changes, "lower") 
+                    elif speech_bmi < 18.5:
+                        increase_weight_changes = [-5, -10, -15, -20]
+                        reduce_cost_and_display_message(st.session_state["speech_person_df"], person.weight, person.height, increase_weight_changes, "increase")
+                    else:
+                        st.markdown("- Twoje BMI jest w normie i nie podwyższa kosztu ubezpieczenia.")                  
     else:
         st.markdown(
         "<h5>Wypełnij formularz</h5>",
@@ -398,11 +415,13 @@ with st.sidebar:
                     st.markdown(f"- Przestań palić, a Twój koszt ubezpieczenia wyniesie {cost_no_smoke} {CURRENCY}!")
 
             if write_bmi > 24.9:
-                reduce_cost_and_display_message(write_person_df, weight, height, -10, "lower")
-
-            if write_bmi < 18.5:
-                reduce_cost_and_display_message(write_person_df, weight, height, 10, "increase")
-
+                lose_weight_changes = [5, 10, 15, 20]  # Możliwe zmiany wagi
+                reduce_cost_and_display_message(write_person_df, weight, height, lose_weight_changes, "lower") 
+            elif write_bmi < 18.5:
+                increase_weight_changes = [-5, -10, -15, -20]
+                reduce_cost_and_display_message(write_person_df, weight, height, increase_weight_changes, "increase")
+            else:
+                st.markdown("- Twoje BMI jest w normie i nie podwyższa kosztu ubezpieczenia.") 
 
 
 
