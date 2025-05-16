@@ -23,10 +23,11 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
+# Sprawdzenie, czy klucz API jest już zapisany w sesji
 if "openai_api_key" not in st.session_state:
     # Sprawdzenie, czy klucz API jest w zmiennych środowiskowych
-    if "OPENAI_API_KEY" in env:
-        st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
+    if 'OPENAI_API_KEY' in env:
+        st.session_state['openai_api_key'] = env['OPENAI_API_KEY']
     else:
         # Prośba o podanie klucza API
         st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
@@ -36,18 +37,17 @@ if "openai_api_key" not in st.session_state:
 
         # Jeśli klucz zostanie podany
         if api_key_input:
-            st.session_state["openai_api_key"] = api_key_input  # Zapisanie klucza do sesji
+            st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
             st.success("Klucz API został zapisany.")
             st.experimental_rerun()  # Odśwież aplikację
 
-        # Jeżeli klucz nie jest podany, zatrzymaj dalsze działanie aplikacji
-        else:
-            st.stop()
-
-# Sprawdzenie dostępności klucza API po próbie wprowadzenia
+# Sprawdzenie dostępności klucza API
 if not st.session_state.get("openai_api_key"):
     st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
     st.stop()  # Zatrzymaj dalsze działanie aplikacji
+
+# Kontynuuj z resztą aplikacji, jeśli klucz API jest dostępny
+st.write("Aplikacja działa z wprowadzonym kluczem API.")
 
 
 openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
