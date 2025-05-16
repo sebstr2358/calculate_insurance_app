@@ -22,6 +22,7 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
+# Inicjalizacja stanu sesji
 if "openai_api_key" not in st.session_state:
     st.session_state["openai_api_key"] = ""
 
