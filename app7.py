@@ -15,8 +15,8 @@ st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
 
 env = dotenv_values(".env")
 
-if 'OPENAI_API_KEY' in st.secrets:
-    env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
+#if 'OPENAI_API_KEY' in st.secrets:
+    #env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 
 AUDIO_TRANSCRIBE_MODEL = "whisper-1"
 CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
@@ -26,13 +26,9 @@ CURRENCY = "USD"
 if "openai_api_key" not in st.session_state:
     st.session_state["openai_api_key"] = ""  # Przypisz pusty klucz API
 
-# Sprawdzenie, czy klucz API jest już zapisany w sekcji
+# Sprawdzenie, czy klucz API jest już zapisany w sesji
 if st.session_state["openai_api_key"] == "":
-    # Sprawdzenie, czy klucz API jest w zmiennych środowiskowych
-    if 'OPENAI_API_KEY' in env:
-        st.session_state['openai_api_key'] = env['OPENAI_API_KEY']
-
-    # Prośba o podanie klucza API, jeśli nie jest dostępny
+    # Prośba o podanie klucza API, jeśli nie jest już dostępny
     st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
 
     # Pole do wprowadzenia klucza API
@@ -44,12 +40,12 @@ if st.session_state["openai_api_key"] == "":
         st.success("Klucz API został zapisany.")
         st.experimental_rerun()  # Odśwież aplikację
 else:
-    st.success("Klucz API jest już używany.")  # Informacja, jeśli klucz jest już zapisany
-
-# Sprawdzenie dostępności klucza API
-if st.session_state.get("openai_api_key") == "":
-    st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
-    st.stop()  # Zatrzymaj dalsze działanie aplikacji
+    # Sprawdzenie dostępności klucza API
+    if st.session_state.get("openai_api_key") == "":
+        st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
+        st.stop()  # Zatrzymaj dalsze działanie aplikacji
+    else:
+        st.success("Aplikacja działa z wprowadzonym kluczem API.")
 
 openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 instructor_openai_client = instructor.from_openai(openai_client)
