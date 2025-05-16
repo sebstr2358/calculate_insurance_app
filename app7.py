@@ -34,7 +34,8 @@ if st.session_state["openai_api_key"] == "":
     if api_key_input:
         st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
         st.success("Klucz API został zapisany.")
-        st.experimental_rerun()  # Odśwież aplikację, aby zniknął input
+        # Usunięcie input po zapisaniu klucza
+        st.session_state["input_given"] = True
 
 # Sprawdzenie dostępności klucza API
 if st.session_state["openai_api_key"] == "":
