@@ -26,12 +26,9 @@ CURRENCY = "USD"
 if "openai_api_key" not in st.session_state:
     st.session_state["openai_api_key"] = ""  # Przypisz pusty klucz API
 
-# Sprawdzenie, czy klucz API jest już zapisany w sesji
+# Prośba o podanie klucza API
 if st.session_state["openai_api_key"] == "":
-    # Prośba o podanie klucza API, jeśli nie jest już dostępny
     st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
-
-    # Pole do wprowadzenia klucza API
     api_key_input = st.text_input("Klucz API", type="password")
 
     # Jeśli klucz zostanie podany
@@ -39,13 +36,17 @@ if st.session_state["openai_api_key"] == "":
         st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
         st.success("Klucz API został zapisany.")
         st.experimental_rerun()  # Odśwież aplikację
-else:
-    # Sprawdzenie dostępności klucza API
-    if st.session_state.get("openai_api_key") == "":
-        st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
-        st.stop()  # Zatrzymaj dalsze działanie aplikacji
-    else:
-        st.success("Aplikacja działa z wprowadzonym kluczem API.")
+
+# Sprawdzenie dostępności klucza API
+if st.session_state["openai_api_key"] == "":
+    st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
+    st.stop()  # Zatrzymaj dalsze działanie aplikacji
+
+# Używanie klucza API z session_state
+try:
+    openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  # Używaj klucza z session_state
+except Exception as e:
+    st.error(f"Wystąpił błąd podczas inicjalizacji klienta OpenAI: {e}")
 
 openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 instructor_openai_client = instructor.from_openai(openai_client)
