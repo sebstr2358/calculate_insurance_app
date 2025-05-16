@@ -23,7 +23,6 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
-# Sprawdzenie, czy klucz API jest już zapisany w sesji
 if "openai_api_key" not in st.session_state:
     # Sprawdzenie, czy klucz API jest w zmiennych środowiskowych
     if "OPENAI_API_KEY" in env:
@@ -31,15 +30,19 @@ if "openai_api_key" not in st.session_state:
     else:
         # Prośba o podanie klucza API
         st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
-        st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")
+
+        # Pole do wprowadzenia klucza API
+        api_key_input = st.text_input("Klucz API", type="password")
 
         # Jeśli klucz zostanie podany
-        if st.session_state["openai_api_key"]:
+        if api_key_input:
+            st.session_state["openai_api_key"] = api_key_input  # Zapisanie klucza do sesji
             st.success("Klucz API został zapisany.")
-            st.session_state["has_api_key"] = True  # Ustaw flagę
+            st.experimental_rerun()  # Odśwież aplikację
 
+        # Jeżeli klucz nie jest podany, zatrzymaj dalsze działanie aplikacji
         else:
-            st.stop()  # Zatrzymaj dalsze działanie aplikacji, gdy klucz nie jest podany
+            st.stop()
 
 # Sprawdzenie dostępności klucza API po próbie wprowadzenia
 if not st.session_state.get("openai_api_key"):
