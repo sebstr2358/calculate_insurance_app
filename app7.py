@@ -43,9 +43,11 @@ if st.session_state["openai_api_key"] == "":
         st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
         st.success("Klucz API został zapisany.")
         st.experimental_rerun()  # Odśwież aplikację
+else:
+    st.success("Klucz API jest już używany.")  # Informacja, jeśli klucz jest już zapisany
 
 # Sprawdzenie dostępności klucza API
-if not st.session_state.get("openai_api_key"):
+if st.session_state.get("openai_api_key") == "":
     st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
     st.stop()  # Zatrzymaj dalsze działanie aplikacji
 
