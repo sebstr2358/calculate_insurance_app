@@ -36,6 +36,10 @@ if not st.session_state.get("openai_api_key"):
 if not st.session_state.get("openai_api_key"):
     st.stop()
 
+# Inicjalizacja klienta OpenAI
+openai_client = OpenAI(api_key=st.session_state["openai_api_key"])
+instructor_openai_client = instructor.from_openai(openai_client)
+
 @st.cache_data
 def get_model():
     return load_model(PREDICTION_CHARGE_MODEL)
