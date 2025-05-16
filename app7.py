@@ -22,6 +22,10 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
+# Ustaw domyślną wartość klucza API, jeśli jeszcze nie istnieje
+if "openai_api_key" not in st.session_state:
+    st.session_state["openai_api_key"] = ""
+
 if st.session_state["openai_api_key"] == "":
     if st.session_state.get("input_given", False):
         st.success("Klucz API został pomyślnie zapisany.")
@@ -34,10 +38,15 @@ if st.session_state["openai_api_key"] == "":
             st.success("Klucz API został zapisany.")
             st.session_state["input_given"] = True  # Dodaj ten stan
 
+# Sprawdzenie dostępności klucza API
+if st.session_state["openai_api_key"] == "":
+    st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
+    st.stop()  # Zatrzymaj dalsze działanie aplikacji
+
 # Używanie klucza API z session_state
 try:
     openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  
-    instructor_openai_client = instructor.from_openai(openai_client)  # Przeniesione tutaj
+    instructor_openai_client = instructor.from_openai(openai_client)
 except Exception as e:
     st.error(f"Wystąpił błąd podczas inicjalizacji klienta OpenAI: {e}")
     st.stop()  # Zatrzymanie działania w przypadku błędu
