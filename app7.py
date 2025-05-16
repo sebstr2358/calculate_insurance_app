@@ -34,11 +34,6 @@ if st.session_state["openai_api_key"] == "":
             st.success("Klucz API został zapisany.")
             st.session_state["input_given"] = True  # Dodaj ten stan
 
-# Sprawdzenie dostępności klucza API
-if st.session_state["openai_api_key"] == "":
-    st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
-    st.stop()  # Zatrzymaj dalsze działanie aplikacji
-
 # Używanie klucza API z session_state
 try:
     openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  
