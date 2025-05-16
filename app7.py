@@ -23,6 +23,9 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
+env = dotenv_values(".env")
+
+# Inicjalizacja stanu sesji z pustym kluczem API
 if "openai_api_key" not in st.session_state:
     st.session_state["openai_api_key"] = ""  # Przypisz pusty klucz API
 
@@ -43,7 +46,8 @@ if st.session_state["openai_api_key"] == "":
 
 # Używanie klucza API z session_state
 try:
-    openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  # Używaj klucza z session_state
+    # Tutaj korzystaj z klucza API z session_state, a nie env
+    openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  
     # Dodaj dodatkowe funkcje korzystające z openai_client tutaj
 except Exception as e:
     st.error(f"Wystąpił błąd podczas inicjalizacji klienta OpenAI: {e}")
