@@ -15,7 +15,6 @@ st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
 
 env = dotenv_values(".env")
 
-
 if 'OPENAI_API_KEY' in st.secrets:
     env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
 
@@ -50,7 +49,7 @@ if not st.session_state.get("openai_api_key"):
 
 # Kontynuuj z resztą aplikacji, jeśli klucz API jest dostępny
 st.write("Aplikacja działa z wprowadzonym kluczem API.")
-
+st.write(st.session_state)
 
 openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 instructor_openai_client = instructor.from_openai(openai_client)
