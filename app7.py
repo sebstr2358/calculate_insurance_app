@@ -11,6 +11,8 @@ from pydantic import BaseModel
 from hashlib import md5
 from typing import Optional
 
+st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
+
 env = dotenv_values(".env")
 
 
@@ -136,9 +138,6 @@ def reduce_cost_and_display_message(person_df, weight, height, weight_changes, d
                 st.markdown(f"- Zwiększ masę o {-valid_weight_change} kg, a Twój koszt ubezpieczenia wyniesie {min_cost} {CURRENCY}!")
 
     return valid_weight_change  # Zwróć wartość zmian wagi, jeśli znalazłeś właściwą
-
-
-st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
 
 
 # Session state initialization
