@@ -26,20 +26,22 @@ CURRENCY = "USD"
 # Sprawdzenie, czy klucz API jest już zapisany w sesji
 if "openai_api_key" not in st.session_state:
     # Sprawdzenie, czy klucz API jest w zmiennych środowiskowych
-    #env = os.environ  # Upewnij się, że zmienne środowiskowe są dostępne
     if "OPENAI_API_KEY" in env:
         st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
     else:
         # Prośba o podanie klucza API
-        st.info("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
+        st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
         st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")
 
-        # Jeśli klucz zostanie podany, przekaż kontrolę do aplikacji
+        # Jeśli klucz zostanie podany
         if st.session_state["openai_api_key"]:
             st.success("Klucz API został zapisany.")
-            st.rerun()  # Odśwież aplikację
+            st.session_state["has_api_key"] = True  # Ustaw flagę
 
-# Sprawdzenie, czy klucz API jest dostępny
+        else:
+            st.stop()  # Zatrzymaj dalsze działanie aplikacji, gdy klucz nie jest podany
+
+# Sprawdzenie dostępności klucza API po próbie wprowadzenia
 if not st.session_state.get("openai_api_key"):
     st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
     st.stop()  # Zatrzymaj dalsze działanie aplikacji
