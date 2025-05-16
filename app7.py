@@ -35,7 +35,6 @@ if st.session_state["openai_api_key"] == "":
     if api_key_input:
         st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
         st.success("Klucz API został zapisany.")
-        st.experimental_rerun()  # Odśwież aplikację
 
 # Sprawdzenie dostępności klucza API
 if st.session_state["openai_api_key"] == "":
@@ -45,6 +44,7 @@ if st.session_state["openai_api_key"] == "":
 # Używanie klucza API z session_state
 try:
     openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  # Używaj klucza z session_state
+    # Dodaj dodatkowe funkcje korzystające z openai_client tutaj
 except Exception as e:
     st.error(f"Wystąpił błąd podczas inicjalizacji klienta OpenAI: {e}")
 
