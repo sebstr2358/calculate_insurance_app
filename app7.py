@@ -13,21 +13,18 @@ from typing import Optional
 
 st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
 
+# Wczytywanie zmiennych środowiskowych z pliku .env
 env = dotenv_values(".env")
 
-#if 'OPENAI_API_KEY' in st.secrets:
-    #env['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
-
+# Modele i stałe
 AUDIO_TRANSCRIBE_MODEL = "whisper-1"
 CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
-env = dotenv_values(".env")
-
 # Inicjalizacja stanu sesji z pustym kluczem API
 if "openai_api_key" not in st.session_state:
-    st.session_state["openai_api_key"] = ""  # Przypisz pusty klucz API
+    st.session_state["openai_api_key"] = ""
 
 # Prośba o podanie klucza API
 if st.session_state["openai_api_key"] == "":
@@ -46,25 +43,18 @@ if st.session_state["openai_api_key"] == "":
 
 # Używanie klucza API z session_state
 try:
-    # Tutaj korzystaj z klucza API z session_state, a nie env
     openai_client = OpenAI(api_key=st.session_state["openai_api_key"])  
-    # Dodaj dodatkowe funkcje korzystające z openai_client tutaj
+    instructor_openai_client = instructor.from_openai(openai_client)  # Przeniesione tutaj
 except Exception as e:
     st.error(f"Wystąpił błąd podczas inicjalizacji klienta OpenAI: {e}")
-
-openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
-instructor_openai_client = instructor.from_openai(openai_client)
+    st.stop()  # Zatrzymanie działania w przypadku błędu
 
 @st.cache_data
 def get_model():
     return load_model(PREDICTION_CHARGE_MODEL)
 
-def get_openai_client():
-    return OpenAI(api_key=st.session_state["openai_api_key"])
-
-# transkrypcja notatki głosowej do tekstu
+# Funkcja do transkrypcji audio
 def transcribe_audio(audio_bytes):
-    openai_client = get_openai_client()
     audio_file = BytesIO(audio_bytes)
     audio_file.name = "audio.mp3"
     transcript = openai_client.audio.transcriptions.create(
@@ -72,7 +62,6 @@ def transcribe_audio(audio_bytes):
         model=AUDIO_TRANSCRIBE_MODEL,
         response_format="verbose_json",
     )
-
     return transcript.text
     
 # Konwersja tekstu do formatu json
