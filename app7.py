@@ -23,31 +23,31 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
 CURRENCY = "USD"
 
-# Sprawdzenie, czy klucz API jest już zapisany w sesji
 if "openai_api_key" not in st.session_state:
+    st.session_state["openai_api_key"] = ""  # Przypisz pusty klucz API
+
+# Sprawdzenie, czy klucz API jest już zapisany w sekcji
+if st.session_state["openai_api_key"] == "":
     # Sprawdzenie, czy klucz API jest w zmiennych środowiskowych
     if 'OPENAI_API_KEY' in env:
         st.session_state['openai_api_key'] = env['OPENAI_API_KEY']
-    else:
-        # Prośba o podanie klucza API
-        st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
 
-        # Pole do wprowadzenia klucza API
-        api_key_input = st.text_input("Klucz API", type="password")
+    # Prośba o podanie klucza API, jeśli nie jest dostępny
+    st.warning("Dodaj swój klucz API OpenAI, aby móc korzystać z tej aplikacji:")
 
-        # Jeśli klucz zostanie podany
-        if api_key_input:
-            st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
-            st.success("Klucz API został zapisany.")
-            st.experimental_rerun()  # Odśwież aplikację
+    # Pole do wprowadzenia klucza API
+    api_key_input = st.text_input("Klucz API", type="password")
+
+    # Jeśli klucz zostanie podany
+    if api_key_input:
+        st.session_state['openai_api_key'] = api_key_input  # Zapisanie klucza do sesji
+        st.success("Klucz API został zapisany.")
+        st.experimental_rerun()  # Odśwież aplikację
 
 # Sprawdzenie dostępności klucza API
 if not st.session_state.get("openai_api_key"):
     st.warning("Musisz podać klucz API, aby korzystać z aplikacji.")
     st.stop()  # Zatrzymaj dalsze działanie aplikacji
-
-# Kontynuuj z resztą aplikacji, jeśli klucz API jest dostępny
-st.write("Aplikacja działa z wprowadzonym kluczem API.")
 
 openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 instructor_openai_client = instructor.from_openai(openai_client)
