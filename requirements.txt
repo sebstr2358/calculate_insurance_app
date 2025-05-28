@@ -1,6 +1,6 @@
 streamlit
-pandas
-pycaret[full]
+pandas==1.5.3
+pycaret[full]==3.3.2
 streamlit-audiorecorder
 python-dotenv
 openai
