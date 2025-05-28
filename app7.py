@@ -19,7 +19,7 @@ env = dotenv_values(".env")
 # Modele i stałe
 AUDIO_TRANSCRIBE_MODEL = "whisper-1"
 CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
-PREDICTION_CHARGE_MODEL = 'v4_insurance_charge_regression'
+PREDICTION_CHARGE_MODEL = 'v5_insurance_charge_regression'
 CURRENCY = "USD"
 
 # OpenAI API key protection
