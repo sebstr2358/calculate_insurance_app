@@ -14,7 +14,7 @@ from typing import Optional
 st.set_page_config(page_title="Kalkulator ubezpieczeń", layout="centered")
 
 # Wczytywanie zmiennych środowiskowych z pliku .env
-env = dotenv_values(".env")
+#env = dotenv_values(".env")
 
 # Modele i stałe
 AUDIO_TRANSCRIBE_MODEL = "whisper-1"
@@ -29,8 +29,11 @@ def is_valid_api_key(api_key):
     return True
 
 def get_openai_client():
-    key = st.session_state["openai_api_key"]
-    return key
+    key = st.session_state.get("openai_api_key")
+    if not key:
+        st.warning("Brakuje klucza OpenAI API.")
+        st.stop()
+    return OpenAI(api_key=key)
 
 # Inicjalizacja klienta OpenAI
 
