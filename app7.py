@@ -172,7 +172,6 @@ if not st.session_state.get("openai_api_key"):
         """
         st.markdown(instruction_html, unsafe_allow_html=True)
         
-        st.info("Dodaj swój klucz API OpenAI aby móc korzystać z tej aplikacji")
         api_key_input = st.text_input("Klucz API", type="password")
 
         if api_key_input:
