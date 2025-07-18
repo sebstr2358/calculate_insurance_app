@@ -150,9 +150,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Pobieranie modelu
-model = get_model()
-
 # OpenAI API key protection
 if not st.session_state.get("openai_api_key"):
     if "OPENAI_API_KEY" in env:
@@ -186,6 +183,9 @@ if not st.session_state.get("openai_api_key"):
 
 if not st.session_state.get("openai_api_key"):
     st.stop()
+
+# Pobieranie modelu
+model = get_model()
 
 # Interfejs użytkownika
 cols = st.columns([2, 5])  # Użyj kolumn 1:4 dla obsługi obrazu i tekstu
