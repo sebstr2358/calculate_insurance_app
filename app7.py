@@ -44,6 +44,7 @@ def get_model():
 openai_client = get_openai_client()
 # Funkcja do transkrypcji audio
 def transcribe_audio(audio_bytes):
+    openai_client = get_openai_client()
     audio_file = BytesIO(audio_bytes)
     audio_file.name = "audio.mp3"
     transcript = openai_client.audio.transcriptions.create(
@@ -53,9 +54,10 @@ def transcribe_audio(audio_bytes):
     )
     return transcript.text
 
-instructor_openai_client = Instructor.from_openai(openai_client)
+
 # Konwersja tekstu do formatu json
 def retrieve_structure(text: str, response_model: BaseModel):
+    instructor_openai_client = Instructor.from_openai(openai_client)
     response = instructor_openai_client.chat.completions.create(
         model=CONVERT_TO_JSON_MODEL,
         temperature=0,
