@@ -6,7 +6,7 @@ from io import BytesIO
 from audiorecorder import audiorecorder
 from dotenv import dotenv_values
 from openai import OpenAI
-import instructor
+from instructor import Instructor
 from pydantic import BaseModel
 from hashlib import md5
 from typing import Optional
@@ -29,18 +29,18 @@ def is_valid_api_key(api_key):
     return True
 
 def get_openai_client():
-    key = st.session_state["openai_api_key"]
-    if not key:
+    key = st.session_state.get("openai_api_key")
+    if not key or not isinstance(key, str):
         st.warning("Brakuje klucza OpenAI API.")
         st.stop()
     return OpenAI(api_key=key)
 
-# Inicjalizacja klienta OpenAI
 
 @st.cache_data
 def get_model():
     return load_model(PREDICTION_CHARGE_MODEL)
 
+# Inicjalizacja klienta OpenAI
 openai_client = get_openai_client()
 # Funkcja do transkrypcji audio
 def transcribe_audio(audio_bytes):
@@ -53,7 +53,7 @@ def transcribe_audio(audio_bytes):
     )
     return transcript.text
 
-instructor_openai_client = instructor.from_openai(openai_client)
+instructor_openai_client = Instructor.from_openai(openai_client)
 # Konwersja tekstu do formatu json
 def retrieve_structure(text: str, response_model: BaseModel):
     response = instructor_openai_client.chat.completions.create(
