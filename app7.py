@@ -29,7 +29,11 @@ def is_valid_api_key(api_key):
     return True
 
 def get_openai_client():
-    return OpenAI(api_key=st.session_state["openai_api_key"])
+    key = st.session_state.get("openai_api_key")
+    if not key:
+        st.warning("Brakuje klucza OpenAI API.")
+        st.stop()
+    return OpenAI(api_key=key)
 
 # Inicjalizacja klienta OpenAI
 
@@ -155,12 +159,11 @@ if not st.session_state.get("openai_api_key"):
         st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
 
     else:
-        
         st.title("Zaloguj do OpenAI")
         
         # Dodanie instrukcji dla użytkownika z kolorową ramką
         instruction_html = """
-        <div style="background-color: #003366; padding: 10px; border-radius: 5px; border: 1px solid #0073e6; margin-bottom: 10px;">
+        <div style="background-color: #f0f4f8; padding: 10px; border-radius: 5px; border: 1px solid #0073e6; margin-bottom: 10px;">
             <h4>Instrukcje uzyskania klucza API</h4>
             <ol>
                 <li>Załóż konto na stronie <a href="https://platform.openai.com/signup" target="_blank">OpenAI</a>.</li>
@@ -171,9 +174,15 @@ if not st.session_state.get("openai_api_key"):
         """
         st.markdown(instruction_html, unsafe_allow_html=True)
         
-        st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")
-        if st.session_state["openai_api_key"]:
-            st.rerun()
+        st.info("Dodaj swój klucz API OpenAI aby móc korzystać z tej aplikacji")
+        api_key_input = st.text_input("Klucz API", type="password")
+
+        if api_key_input:
+            if is_valid_api_key(api_key_input):
+                st.session_state["openai_api_key"] = api_key_input
+                st.rerun()
+            else:
+                st.error("Podany klucz API jest niepoprawny. Upewnij się, że klucz zaczyna się od 'sk-' i ma 51 znaków długości.")
 
 if not st.session_state.get("openai_api_key"):
     st.stop()
