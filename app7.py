@@ -29,11 +29,8 @@ def is_valid_api_key(api_key):
     return True
 
 def get_openai_client():
-    key = st.session_state.get("openai_api_key")
-    if not key:
-        st.warning("Brakuje klucza OpenAI API.")
-        st.stop()
-    return OpenAI(api_key=key)
+    key = st.session_state["openai_api_key"]
+    return key
 
 # Inicjalizacja klienta OpenAI
 
