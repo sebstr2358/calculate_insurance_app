@@ -29,12 +29,10 @@ def is_valid_api_key(api_key):
     return True
 
 def get_openai_client():
-    key = st.session_state["openai_api_key"]
-    return key
+    return OpenAI(api_key=st.session_state["openai_api_key"])
 
 # Inicjalizacja klienta OpenAI
-api_key = get_openai_client()
-openai_client = OpenAI(api_key=api_key)
+openai_client = get_openai_client()
 instructor_openai_client = instructor.from_openai(openai_client)
 
 @st.cache_data
