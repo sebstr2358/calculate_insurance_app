@@ -179,7 +179,7 @@ if not st.session_state.get("openai_api_key"):
                 st.session_state["openai_api_key"] = api_key_input
                 st.rerun()
             else:
-                st.error("Podany klucz API jest niepoprawny. Upewnij się, że klucz zaczyna się od 'sk-' i ma 51 znaków długości.")
+                st.error("Podany klucz API jest niepoprawny. Upewnij się, że klucz zaczyna się od 'sk-' i ma 164 znaki długości.")
 
 if not st.session_state.get("openai_api_key"):
     st.stop()
