@@ -33,7 +33,7 @@ if not st.session_state.get("openai_api_key"):
         
         # Dodanie instrukcji dla użytkownika z kolorową ramką
         instruction_html = """
-        <div style="background-color: #f0f4f8; padding: 10px; border-radius: 5px; border: 1px solid #0073e6; margin-bottom: 10px;">
+        <div style="background-color: #e0f7fa; padding: 10px; border-radius: 5px; border: 1px solid #0073e6; margin-bottom: 10px;">
             <h4>Instrukcje uzyskania klucza API</h4>
             <ol>
                 <li>Załóż konto na stronie <a href="https://platform.openai.com/signup" target="_blank">OpenAI</a>.</li>
