@@ -33,7 +33,8 @@ def get_openai_client():
     return key
 
 # Inicjalizacja klienta OpenAI
-openai_client = OpenAI(api_key=get_openai_client())
+api_key = get_openai_client()
+openai_client = OpenAI(api_key=api_key)
 instructor_openai_client = instructor.from_openai(openai_client)
 
 @st.cache_data
