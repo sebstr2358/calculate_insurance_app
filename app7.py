@@ -32,13 +32,12 @@ def get_openai_client():
     return OpenAI(api_key=st.session_state["openai_api_key"])
 
 # Inicjalizacja klienta OpenAI
-openai_client = get_openai_client()
-instructor_openai_client = instructor.from_openai(openai_client)
 
 @st.cache_data
 def get_model():
     return load_model(PREDICTION_CHARGE_MODEL)
 
+openai_client = get_openai_client()
 # Funkcja do transkrypcji audio
 def transcribe_audio(audio_bytes):
     audio_file = BytesIO(audio_bytes)
@@ -49,7 +48,8 @@ def transcribe_audio(audio_bytes):
         response_format="verbose_json",
     )
     return transcript.text
-    
+
+instructor_openai_client = instructor.from_openai(openai_client)
 # Konwersja tekstu do formatu json
 def retrieve_structure(text: str, response_model: BaseModel):
     response = instructor_openai_client.chat.completions.create(
