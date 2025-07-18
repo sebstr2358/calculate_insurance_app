@@ -22,37 +22,18 @@ CONVERT_TO_JSON_MODEL = "gpt-4o-mini"
 PREDICTION_CHARGE_MODEL = 'v5_insurance_charge_regression'
 CURRENCY = "USD"
 
-# OpenAI API key protection
-if not st.session_state.get("openai_api_key"):
-    if "OPENAI_API_KEY" in env:
-        st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
+def is_valid_api_key(api_key):
+    # Sprawdź długość klucza
+    if len(api_key) != 164 or not api_key.startswith("sk-"):
+        return False
+    return True
 
-    else:
-        
-        st.title("Zaloguj do OpenAI")
-        
-        # Dodanie instrukcji dla użytkownika z kolorową ramką
-        instruction_html = """
-        <div style="background-color: #003366; padding: 10px; border-radius: 5px; border: 1px solid #0073e6; margin-bottom: 10px;">
-            <h4>Instrukcje uzyskania klucza API</h4>
-            <ol>
-                <li>Załóż konto na stronie <a href="https://platform.openai.com/signup" target="_blank">OpenAI</a>.</li>
-                <li>Wygeneruj swój klucz API w sekcji API Keys.</li>
-                <li>Wklej go poniżej.</li>
-            </ol>
-        </div>
-        """
-        st.markdown(instruction_html, unsafe_allow_html=True)
-        
-        st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")
-        if st.session_state["openai_api_key"]:
-            st.rerun()
-
-if not st.session_state.get("openai_api_key"):
-    st.stop()
+def get_openai_client():
+    key = st.session_state["openai_api_key"]
+    return key
 
 # Inicjalizacja klienta OpenAI
-openai_client = OpenAI(api_key=st.session_state["openai_api_key"])
+openai_client = OpenAI(api_key=get_openai_client())
 instructor_openai_client = instructor.from_openai(openai_client)
 
 @st.cache_data
@@ -168,6 +149,35 @@ st.markdown("""
 
 # Pobieranie modelu
 model = get_model()
+
+# OpenAI API key protection
+if not st.session_state.get("openai_api_key"):
+    if "OPENAI_API_KEY" in env:
+        st.session_state["openai_api_key"] = env["OPENAI_API_KEY"]
+
+    else:
+        
+        st.title("Zaloguj do OpenAI")
+        
+        # Dodanie instrukcji dla użytkownika z kolorową ramką
+        instruction_html = """
+        <div style="background-color: #003366; padding: 10px; border-radius: 5px; border: 1px solid #0073e6; margin-bottom: 10px;">
+            <h4>Instrukcje uzyskania klucza API</h4>
+            <ol>
+                <li>Załóż konto na stronie <a href="https://platform.openai.com/signup" target="_blank">OpenAI</a>.</li>
+                <li>Wygeneruj swój klucz API w sekcji API Keys.</li>
+                <li>Wklej go poniżej.</li>
+            </ol>
+        </div>
+        """
+        st.markdown(instruction_html, unsafe_allow_html=True)
+        
+        st.session_state["openai_api_key"] = st.text_input("Klucz API", type="password")
+        if st.session_state["openai_api_key"]:
+            st.rerun()
+
+if not st.session_state.get("openai_api_key"):
+    st.stop()
 
 # Interfejs użytkownika
 cols = st.columns([2, 5])  # Użyj kolumn 1:4 dla obsługi obrazu i tekstu
